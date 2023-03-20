@@ -11,11 +11,12 @@ class Node:
         if current_layer >= len(nodes_per_layer):
             return
         
-        #creates children
+        #creates first layer
         for i in range(nodes_per_layer[current_layer]):
             self.children.append(Node((f"layer[{current_layer}]---- Node - {i}")))
+            self.children[i].collector = INPUT_VALUES[i]
 
-        #traverses NODE_PER_LAYER
+        #traverses NODE_PER_LAYER on the first node
         self.children[0].make_children(current_layer + 1, nodes_per_layer)
 
         #copies children to other nodes
@@ -35,6 +36,6 @@ class Node:
             
 
 if __name__ == '__main__':
-    node = Node("0")
+    node = Node("Master")
     node.make_children(0, NODES_PER_LAYER)
     node.print(0, NODES_PER_LAYER)
