@@ -5,7 +5,6 @@ class Node:
     def __init__(self, name):
         self.children = []
         self.name = name
-        self.collector = []
         self.input = None
 
     def make_children(self, current_layer, nodes_per_layer, past_sum=0):
@@ -38,7 +37,7 @@ class Node:
     def print(self):
         print(self.children[0].children[0].input)
         print(self.children[0].children[1].input)
-        print(self.children[0].children[1].children[0].input)
+        print(self.children[0].children[0].children[0].input)
         
             
 
