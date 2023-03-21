@@ -13,7 +13,7 @@ class Node:
         
         #creates layers
         for i in range(nodes_per_layer[current_layer]):
-            self.children.append(Node((f"layer[{current_layer}]---- Node - {i}")))
+            self.children.append(Node((f"layer[{current_layer}]---- Node - {i+1}")))
 
             if(current_layer == 0):
                 self.children[i].input = INPUT_VALUES[i]
@@ -35,8 +35,17 @@ class Node:
 
 
     def print(self):
+        for i in range(NODES_PER_LAYER[0]):
+            print(self.children[i].name)
+            print(self.children[i].input)
+
+        print(self.children[0].children[0].name)
         print(self.children[0].children[0].input)
+
+        print(self.children[0].children[1].name)
         print(self.children[0].children[1].input)
+
+        print(self.children[0].children[0].children[0].name)
         print(self.children[0].children[0].children[0].input)
         
             
