@@ -1,11 +1,15 @@
+import csv, random
+
 NODES_PER_LAYER = [4, 2, 1] 
 INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]   
 
 class Node:
     def __init__(self, name):
         self.children = []
+        self.weight = []
         self.name = name
         self.input = None
+        self.information = self.readFile()
 
     def make_children(self, current_layer, nodes_per_layer, past_sum=0):
         if current_layer >= len(nodes_per_layer):
@@ -33,11 +37,34 @@ class Node:
         for i in range(1, len(self.children)):
             self.children[i].children = self.children[0].children[:]
 
+    def readFile(self):
+        with open('index.csv') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                first_four = row[:4]
+                return first_four
+            
+    def random_weights(self, current_layer, node_per_layer):
+        if current_layer >= len(node_per_layer):
+            return
+        
+        self.weight = [0.0] * len(self.children)
+
+        for i in range(len(self.children)):
+
+            self.weight[i] = random.uniform(0, 1)
+
+            self.children[i].random_weights(current_layer + 1, node_per_layer)
+
+        return
+
 
     def print(self):
         for i in range(NODES_PER_LAYER[0]):
             print(self.children[i].name)
             print(self.children[i].input)
+
+        print(self)    
 
         print(self.children[0].children[0].name)
         print(self.children[0].children[0].input)
@@ -53,4 +80,5 @@ class Node:
 if __name__ == '__main__':
     node = Node("Master")
     node.make_children(0, NODES_PER_LAYER)
+    node.random_weights(0, NODES_PER_LAYER)
     node.print()
