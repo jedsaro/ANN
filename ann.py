@@ -57,9 +57,6 @@ class Node:
             self.children[i].random_weights(current_layer + 1, node_per_layer)
 
         return
-
-
-
     def print(self):
         for i in range(len(self.children)):
             try: 
@@ -68,10 +65,11 @@ class Node:
 
             except:
                 pass
-            
+
         for i in range(NODES_PER_LAYER[0]):
             print(self.children[i].name)
             print(self.children[i].input)
+            
 
 
         print(self.children[0].children[0].name)
