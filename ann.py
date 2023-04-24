@@ -59,12 +59,20 @@ class Node:
         return
 
 
+
     def print(self):
+        for i in range(len(self.children)):
+            try: 
+
+                print(f"Weight of {self.weight[i]}")
+
+            except:
+                pass
+            
         for i in range(NODES_PER_LAYER[0]):
             print(self.children[i].name)
             print(self.children[i].input)
 
-        print(self)    
 
         print(self.children[0].children[0].name)
         print(self.children[0].children[0].input)
