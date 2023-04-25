@@ -33,7 +33,6 @@ class Node:
             return 
         
         for i in range(nodes_per_layer[current_layer]):
-            print(nodes_per_layer[current_layer])
             if(current_layer == 0):
                 self.children[i].input = INPUT_VALUES[i]
 
@@ -41,7 +40,6 @@ class Node:
             if current_layer > 0:
                 self.children[i].input = past_sum
             
-  
             if i == 0:
                 next_sum = sum(np.dot(self.children[i].input, self.weight))
                 if(nodes_per_layer[current_layer] == 2):
@@ -61,7 +59,7 @@ class Node:
         self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
 
     def sigmoid(self, x):
-        return 1 / (1 + math.exp(-x))
+        return 1 / (1 + np.exp(-x))
     
     def readFile(self, NEXTLINE = False):
         with open('index.csv') as csvfile:
