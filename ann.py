@@ -11,7 +11,7 @@ class Node:
         self.input = None
         self.information = self.readFile()
 
-    def make_children(self, current_layer, nodes_per_layer, past_sum=0):
+    def make_children(self, current_layer, nodes_per_layer):
         if current_layer >= len(nodes_per_layer):
             return
         
@@ -19,6 +19,19 @@ class Node:
         for i in range(nodes_per_layer[current_layer]):
             self.children.append(Node((f"layer[{current_layer}]---- Node - {i+1}")))
 
+        #traverses NODE_PER_LAYER on the first node
+        self.children[0].make_children(current_layer + 1, nodes_per_layer)
+
+        #copies children to other nodes
+        for i in range(1, len(self.children)):
+            self.children[i].children = self.children[0].children[:]
+
+    def feedFoward(self, current_layer, nodes_per_layer, past_sum=0):
+        if current_layer >= len(nodes_per_layer):
+            return
+        
+        for i in range(nodes_per_layer[current_layer]):
+            
             if(current_layer == 0):
                 self.children[i].input = INPUT_VALUES[i]
 
@@ -30,12 +43,8 @@ class Node:
             else:
                 next_sum += self.children[i].input
 
-        #traverses NODE_PER_LAYER on the first node
-        self.children[0].make_children(current_layer + 1, nodes_per_layer, next_sum)
-
-        #copies children to other nodes
-        for i in range(1, len(self.children)):
-            self.children[i].children = self.children[0].children[:]
+        self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
+        
 
     def readFile(self):
         with open('index.csv') as csvfile:
@@ -57,6 +66,7 @@ class Node:
             self.children[i].random_weights(current_layer + 1, node_per_layer)
 
         return
+    
     def print(self):
         for i in range(len(self.children)):
             try: 
@@ -87,4 +97,5 @@ if __name__ == '__main__':
     node = Node("Master")
     node.make_children(0, NODES_PER_LAYER)
     node.random_weights(0, NODES_PER_LAYER)
+    node.feedFoward(0, NODES_PER_LAYER)
     node.print()
