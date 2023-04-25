@@ -1,4 +1,4 @@
-import csv, random
+import csv, random, math 
 
 NODES_PER_LAYER = [4, 2, 1] 
 INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]   
@@ -39,12 +39,24 @@ class Node:
                 self.children[i].input = past_sum
 
             if i == 0:
-                next_sum = self.children[i].input
+                #next_sum = self.children[i].input
             else:
                 next_sum += self.children[i].input
 
         self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
         
+
+    def sigmoid(self, x):
+        return 1 / (1 + math.exp(-x))
+    
+    def dot_product(self,sum_val, mul_val):
+        return sum_val / mul_val
+    
+    def multiply_array(arr):
+        result = 1
+        for num in arr:
+            result *= num
+        return result
 
     def readFile(self):
         with open('index.csv') as csvfile:
@@ -70,7 +82,6 @@ class Node:
     def print(self):
         for i in range(len(self.children)):
             try: 
-
                 print(f"Weight of {self.weight[i]}")
 
             except:
@@ -79,8 +90,6 @@ class Node:
         for i in range(NODES_PER_LAYER[0]):
             print(self.children[i].name)
             print(self.children[i].input)
-            
-
 
         print(self.children[0].children[0].name)
         print(self.children[0].children[0].input)
