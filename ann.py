@@ -3,7 +3,6 @@ import numpy as np
 
 NODES_PER_LAYER = [4, 2, 1] 
 INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]
-TEST = [1,2,3,4] 
 
 class Node:
     def __init__(self, name):
@@ -29,11 +28,12 @@ class Node:
             self.children[i].children = self.children[0].children[:]
 
     def feedFoward(self, current_layer, nodes_per_layer, past_sum=0):
+
         if current_layer >= len(nodes_per_layer):
-            return
+            return 
         
         for i in range(nodes_per_layer[current_layer]):
-            
+            print(nodes_per_layer[current_layer])
             if(current_layer == 0):
                 self.children[i].input = INPUT_VALUES[i]
 
@@ -41,31 +41,33 @@ class Node:
             if current_layer > 0:
                 self.children[i].input = past_sum
             
+  
             if i == 0:
-                next_sum = self.sigmoid(sum(np.dot(past_sum, self.weight)))
+                next_sum = sum(np.dot(self.children[i].input, self.weight))
+                if(nodes_per_layer[current_layer] == 2):
+                    next_sum = self.sigmoid(next_sum)
+                    self.children[i].output = next_sum # set sigmoidal result for the first hidden layer node
+                else:
+                    self.children[i].output = next_sum
+                
             else:
-                next_sum += self.sigmoid(sum(np.dot(past_sum, self.weight)))
+                next_sum += sum(np.dot(self.children[i].input, self.weight))
+                if(current_layer == 1):
+                    next_sum = self.sigmoid(next_sum)
+                    self.children[i].output = next_sum # set sigmoidal result for the second hidden layer node
+                else:
+                    self.children[i].output = next_sum
 
         self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
-
-    def activate(self):
-        
-
-        print(self.weight)
-        print(self.children[0].children[0].input)
-
-        self.children[0].children[0].input = self.sigmoid(sum(np.dot(self.children[0].children[0].input, self.weight)))
-        self.children[0].children[1].input = self.sigmoid(sum(np.dot(self.children[0].children[1].input, self.weight)))
-        temp = self.sigmoid(sum((np.dot(self.children[0].children[0].input, self.children[0].children[1].input),)))
-        self.children[0].children[0].children[0].input = temp
-        
 
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
     
-    def readFile(self):
+    def readFile(self, NEXTLINE = False):
         with open('index.csv') as csvfile:
             reader = csv.reader(csvfile)
+            if(NEXTLINE):
+                next(reader)
             for row in reader:
                 first_four = row[:4]
                 return first_four
@@ -112,5 +114,4 @@ if __name__ == '__main__':
     node.make_children(0, NODES_PER_LAYER)
     node.random_weights(0, NODES_PER_LAYER)
     node.feedFoward(0, NODES_PER_LAYER)
-    node.activate()
     node.print()
