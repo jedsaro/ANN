@@ -1,7 +1,9 @@
 import csv, random, math 
+import numpy as np
 
 NODES_PER_LAYER = [4, 2, 1] 
-INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]   
+INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]
+TEST = [1,2,3,4] 
 
 class Node:
     def __init__(self, name):
@@ -35,29 +37,32 @@ class Node:
             if(current_layer == 0):
                 self.children[i].input = INPUT_VALUES[i]
 
+            #ya adentro
             if current_layer > 0:
                 self.children[i].input = past_sum
-
+            
             if i == 0:
-                #next_sum = self.children[i].input
+                next_sum = self.sigmoid(sum(np.dot(past_sum, self.weight)))
             else:
-                next_sum += self.children[i].input
+                next_sum += self.sigmoid(sum(np.dot(past_sum, self.weight)))
 
         self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
+
+    def activate(self):
+        
+
+        print(self.weight)
+        print(self.children[0].children[0].input)
+
+        self.children[0].children[0].input = self.sigmoid(sum(np.dot(self.children[0].children[0].input, self.weight)))
+        self.children[0].children[1].input = self.sigmoid(sum(np.dot(self.children[0].children[1].input, self.weight)))
+        temp = self.sigmoid(sum((np.dot(self.children[0].children[0].input, self.children[0].children[1].input),)))
+        self.children[0].children[0].children[0].input = temp
         
 
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
     
-    def dot_product(self,sum_val, mul_val):
-        return sum_val / mul_val
-    
-    def multiply_array(arr):
-        result = 1
-        for num in arr:
-            result *= num
-        return result
-
     def readFile(self):
         with open('index.csv') as csvfile:
             reader = csv.reader(csvfile)
@@ -82,7 +87,7 @@ class Node:
     def print(self):
         for i in range(len(self.children)):
             try: 
-                print(f"Weight of {self.weight[i]}")
+                print(f"{self.weight[i]}")
 
             except:
                 pass
@@ -107,4 +112,5 @@ if __name__ == '__main__':
     node.make_children(0, NODES_PER_LAYER)
     node.random_weights(0, NODES_PER_LAYER)
     node.feedFoward(0, NODES_PER_LAYER)
+    node.activate()
     node.print()
