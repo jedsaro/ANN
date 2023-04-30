@@ -1,55 +1,23 @@
-import csv, random, math 
+import csv
 import numpy as np
 
 NODES_PER_LAYER = [4, 2, 1] 
-INPUT_VALUES = [4.1, 5.5, 3.3, 10.1]
-TEST = [1,2,3,4] 
 
 class Node:
-    def __init__(self, name):
-        self.children = []
-        self.weight = []
-        self.name = name
-        self.input = None
+    def __init__(self):
+        self.W1 = np.random.randn(NODES_PER_LAYER[0], NODES_PER_LAYER[1])
+        self.W2 = np.random.randn(NODES_PER_LAYER[1], NODES_PER_LAYER[2])
         self.information = self.readFile()
 
-    def make_children(self, current_layer, nodes_per_layer):
-        if current_layer >= len(nodes_per_layer):
-            return
+    def feedFoward(self, input_values):
+        self.z2 = np.dot(input_values, self.W1)
+        self.a2 = self.sigmoidx(self.z2)
+        self.z3 = np.dot(self.a2, self.W2)
+        output = self.sigmoidx(self.z3) 
+        return output
         
-        #creates layers
-        for i in range(nodes_per_layer[current_layer]):
-            self.children.append(Node((f"layer[{current_layer}]---- Node - {i+1}")))
-
-        #traverses NODE_PER_LAYER on the first node
-        self.children[0].make_children(current_layer + 1, nodes_per_layer)
-
-        #copies children to other nodes
-        for i in range(1, len(self.children)):
-            self.children[i].children = self.children[0].children[:]
-
-    def feedFoward(self, current_layer, nodes_per_layer, past_sum=0):
-        if current_layer >= len(nodes_per_layer):
-            return
-        
-        for i in range(nodes_per_layer[current_layer]):
-            
-            if(current_layer == 0):
-                self.children[i].input = INPUT_VALUES[i]
-
-            #ya adentro
-            if current_layer > 0:
-                self.children[i].input = past_sum
-            
-            if i == 0:
-                next_sum = self.sigmoid(sum(np.dot(past_sum, self.weight)))
-            else:
-                next_sum += self.sigmoid(sum(np.dot(past_sum, self.weight)))
-
-        self.children[i].feedFoward(current_layer + 1, nodes_per_layer, next_sum)
-        
-    def sigmoid(self, x):
-        return 1 / (1 + math.exp(-x))
+    def sigmoidx(self, x):
+        return 1 / (1 + np.exp(-x))
     
     def readFile(self):
         with open('index.csv') as csvfile:
@@ -58,47 +26,22 @@ class Node:
                 first_four = row[:4]
                 return first_four
             
-    def random_weights(self, current_layer, node_per_layer):
-        if current_layer >= len(node_per_layer):
-            return
-        
-        self.weight = [0.0] * len(self.children)
-
-        for i in range(len(self.children)):
-
-            self.weight[i] = random.uniform(0, 1)
-
-            self.children[i].random_weights(current_layer + 1, node_per_layer)
-
-        return
-    
     def print(self):
-        for i in range(len(self.children)):
+    #w1s
+        for i in range(len(self.W1)):
             try: 
-                print(f"{self.weight[i]}")
-
+                print(f"{self.W1[i]}")
             except:
                 pass
 
-        for i in range(NODES_PER_LAYER[0]):
-            print(self.children[i].name)
-            print(self.children[i].input)
+        for i in range(len(self.W2)):
+            try: 
+                print(f"{self.W2[i]}")
+            except:
+                pass
 
-        print(self.children[0].children[0].name)
-        print(self.children[0].children[0].input)
-
-        print(self.children[0].children[1].name)
-        print(self.children[0].children[1].input)
-
-        print(self.children[0].children[0].children[0].name)
-        print(self.children[0].children[0].children[0].input)
-        
-            
 
 if __name__ == '__main__':
-    node = Node("Master")
-    node.make_children(0, NODES_PER_LAYER)
-    node.random_weights(0, NODES_PER_LAYER)
-    node.feedFoward(0, NODES_PER_LAYER)
-    node.activate()
-    node.print()
+    input_values = [4.1, 5.5, 3.3, 10.1]
+    ann = Node()
+    print(ann.feedFoward(input_values))
