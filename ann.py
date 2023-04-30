@@ -26,10 +26,10 @@ class ANN:
         self.W2 -= l_rate * update_layer2
     
     def backpropagate(self, inputs , output, expected):
-        delta3 = np.multiply(-(expected-output), self.sigmoid_derivative(self.layer3))
-        dJdW2 = np.dot(self.layer_2_activate.T, delta3)
-        deltlayer_2_activate = np.dot(delta3, self.W2.T) * self.sigmoid_derivative(self.layer2)
-        dJdW1 = np.dot(inputs.T, deltlayer_2_activate)  
+        delta3_activate = np.multiply(-(expected-output), self.sigmoid_derivative(self.layer3))
+        dJdW2 = np.dot(self.layer_2_activate.T, delta3_activate)
+        delta2_activate = np.dot(delta3_activate, self.W2.T) * self.sigmoid_derivative(self.layer2)
+        dJdW1 = np.dot(inputs.T, delta2_activate)  
         return dJdW1, dJdW2
     
     def training(self,l_rate, n_epoch, target_error):
