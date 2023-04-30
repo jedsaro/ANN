@@ -9,10 +9,10 @@ class ANN:
         self.W2 = np.random.uniform(0,1, size= (NODES_PER_LAYER[1], NODES_PER_LAYER[2]))
 
     def feedForward(self, inputs):
-        self.z2 = np.dot(inputs, self.W1)
-        self.a2 = self.sigmoid(self.z2)
-        self.z3 = np.dot(self.a2, self.W2)
-        output = self.sigmoid(self.z3)
+        self.layer2 = np.dot(inputs, self.W1)
+        self.layer_2_activate = self.sigmoid(self.layer2)
+        self.layer3 = np.dot(self.layer_2_activate, self.W2)
+        output = self.sigmoid(self.layer3)
         return output
     
     def sigmoid(self, x):
@@ -26,10 +26,10 @@ class ANN:
         self.W2 -= l_rate * update_layer2
     
     def backpropagate(self, inputs , output, expected):
-        delta3 = np.multiply(-(expected-output), self.sigmoid_derivative(self.z3))
-        dJdW2 = np.dot(self.a2.T, delta3)
-        delta2 = np.dot(delta3, self.W2.T) * self.sigmoid_derivative(self.z2)
-        dJdW1 = np.dot(inputs.T, delta2)  
+        delta3 = np.multiply(-(expected-output), self.sigmoid_derivative(self.layer3))
+        dJdW2 = np.dot(self.layer_2_activate.T, delta3)
+        deltlayer_2_activate = np.dot(delta3, self.W2.T) * self.sigmoid_derivative(self.layer2)
+        dJdW1 = np.dot(inputs.T, deltlayer_2_activate)  
         return dJdW1, dJdW2
     
     def training(self,l_rate, n_epoch, target_error):
@@ -54,4 +54,4 @@ class ANN:
                         
 if __name__ == '__main__':
     ann = ANN()
-    ann.training(.05,1000000000,.5)
+    ann.training(.8,1000000000,.5)
