@@ -17,8 +17,8 @@ class ANN:
         output = self.sigmoid(self.z3) 
         return output
     
-    def costFunction(self, X, y):
-        return 0.5*sum((y-X)**2) 
+    def costFunction(self, X, expected):
+        return 0.5*sum((expected-X)**2) 
     
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -30,8 +30,8 @@ class ANN:
         self.W1 -= l_rate * update_layer1
         self.W2 -= l_rate * update_layer2
     
-    def backpropagate(self, output, y):
-        delta3 = np.multiply(-(y-output), self.sigmoid_derivative(self.z3))
+    def backpropagate(self, output, expected):
+        delta3 = np.multiply(-(expected-output), self.sigmoid_derivative(self.z3))
         dJdW2 = np.dot(self.a2.T, delta3)
         delta2 = np.dot(delta3, self.W2.T)*self.sigmoid_derivative(self.z2)
         dJdW1 = np.dot(output.T, delta2) 
@@ -49,7 +49,7 @@ class ANN:
                     float_row = np.array([float(element) for element in row[:4]]).reshape(1, -1)
                     expected = np.array([float(row[i]) for i in range(4, 4 + NODES_PER_LAYER[-1])]).reshape(1, -1)
                     output = self.feedForward(float_row)
-                    for i in range(1): #temp range
+                    for i in range(1): 
                         self.collector.append(output)
                         sum_error += (float(row[number_of_inputs + i])- self.collector[-1][i])**2
                         dJdW1, dJdW2 = self.backpropagate(output, expected)
@@ -57,16 +57,12 @@ class ANN:
                         #bp_result = self.backpropagate(output[i], expected[-1][i])
 
             if sum_error <= target_error:
-                print("Target Error Reached error=%.3f" % ( sum_error))
+                print("Target Error Reached error=%.3f" % (sum_error))
 
                 return
 
             print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
                         
-
-                    
-
-
 if __name__ == '__main__':
     ann = ANN()
-    ann.training(.8,50000,.1)
+    ann.training(.8,10,.1)
