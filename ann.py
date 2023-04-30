@@ -10,6 +10,7 @@ class Node:
         self.W1 = np.random.randn(NODES_PER_LAYER[0], NODES_PER_LAYER[1])
         self.W2 = np.random.randn(NODES_PER_LAYER[1], NODES_PER_LAYER[2])
         self.collector = []
+        self.output = self.feedForward(self.inputs)
 
     def feedForward(self, input_values):
         self.z2 = np.dot(input_values, self.W1)
@@ -17,9 +18,27 @@ class Node:
         self.z3 = np.dot(self.a2, self.W2)
         output = self.sigmoidx(self.z3) 
         return output
-        
+    
+    def costFunction(self, x, y):
+        return 0.5*sum((y-self.output)**2) 
+    
     def sigmoidx(self, x):
         return 1 / (1 + np.exp(-x))
+    
+    def sigPrime(self, x):
+        return np.exp(-x)/((1+np.exp(-x))**2)
+    
+    def costFunctionPrime(self, X, y):
+        #Compute derivative with respect to W and W2 for a given X and y:
+
+        delta3 = np.multiply(-(y-self.output), self.sigPrime(self.z3))
+        dJdW2 = np.dot(self.a2.T, delta3)
+        
+        delta2 = np.dot(delta3, self.W2.T)*self.sigPrime(self.z2)
+        dJdW1 = np.dot(X.T, delta2)  
+        return dJdW1, dJdW2
+    
+
     
     # def readFile(self):
     #     with open('index.csv') as csvfile:
@@ -27,8 +46,6 @@ class Node:
     #         for row in reader:
     #             first_four = [int(x) for x in row[:4]]
     #             return first_four
-
-    
             
     def first_train_assign(self, l_rate, n_epoch, target_error):
         number_of_inputs = len(self.inputs)
