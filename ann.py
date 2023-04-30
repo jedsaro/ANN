@@ -26,13 +26,13 @@ class ANN:
     def sigmoid_derivative(self, x):
         return np.exp(-x)/((1+np.exp(-x))**2)
     
-    def backpropagate(self, X, y):
-        output_error = y-X
-        delta3 = np.multiply(-(output_error), self.sigmoid_derivative(self.z3))
+    def backpropagate(self, X, y, sum_error):
+        
+        delta3 = np.multiply(-(y-self.yHat), self.sigmoid_derivative(self.z3))
         dJdW2 = np.dot(self.a2.T, delta3)
         
         delta2 = np.dot(delta3, self.W2.T)*self.sigmoid_derivative(self.z2)
-        dJdW1 = np.dot(X.T, delta2)  
+        dJdW1 = np.dot(X.T, delta2) 
 
         return dJdW1, dJdW2
     
@@ -49,7 +49,14 @@ class ANN:
                 for row in reader:
                     float_row = [float(element) for element in row[:4]]
                     output = self.feedForward(float_row)
-                    print(output)
+                    expected = []
+                    for i in range(1): #temp range
+                        expected.append(row[number_of_inputs + i])
+                        self.collector.append(output)
+                        sum_error += (float(row[number_of_inputs + i] )- self.collector[-1][i])**2
+                        #bp_result = self.backpropagate(output, expected[-1], sum_error)
+
+                    
 
 
 if __name__ == '__main__':
