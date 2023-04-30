@@ -26,39 +26,47 @@ class ANN:
     def sigmoid_derivative(self, x):
         return np.exp(-x)/((1+np.exp(-x))**2)
     
-    def backpropagate(self, X, y, sum_error):
-        
-        delta3 = np.multiply(-(y-self.yHat), self.sigmoid_derivative(self.z3))
+    def update_weights(self,l_rate, update_layer1, update_layer2):
+        self.W1 -= l_rate * update_layer1
+        self.W2 -= l_rate * update_layer2
+    
+    def backpropagate(self, output, y):
+        delta3 = np.multiply(-(y-output), self.sigmoid_derivative(self.z3))
         dJdW2 = np.dot(self.a2.T, delta3)
-        
         delta2 = np.dot(delta3, self.W2.T)*self.sigmoid_derivative(self.z2)
-        dJdW1 = np.dot(X.T, delta2) 
+        dJdW1 = np.dot(output.T, delta2) 
 
         return dJdW1, dJdW2
-    
-    def sum_error(self,x,y):
-        return (x - y)**2
+
         
-    
-    def first_train_assign(self, n_epoch):
+    def training(self,l_rate, n_epoch, target_error):
         number_of_inputs = len(self.inputs)
         for epoch in range(n_epoch):
             sum_error = 0
             with open('index.csv') as csvfile:
                 reader = csv.reader(csvfile)
                 for row in reader:
-                    float_row = [float(element) for element in row[:4]]
+                    float_row = np.array([float(element) for element in row[:4]]).reshape(1, -1)
+                    expected = np.array([float(row[i]) for i in range(4, 4 + NODES_PER_LAYER[-1])]).reshape(1, -1)
                     output = self.feedForward(float_row)
-                    expected = []
                     for i in range(1): #temp range
-                        expected.append(row[number_of_inputs + i])
                         self.collector.append(output)
-                        sum_error += (float(row[number_of_inputs + i] )- self.collector[-1][i])**2
-                        #bp_result = self.backpropagate(output, expected[-1], sum_error)
+                        sum_error += (float(row[number_of_inputs + i])- self.collector[-1][i])**2
+                        dJdW1, dJdW2 = self.backpropagate(output, expected)
+                        self.update_weights(l_rate, dJdW1, dJdW2)
+                        #bp_result = self.backpropagate(output[i], expected[-1][i])
+
+            if sum_error <= target_error:
+                print("Target Error Reached error=%.3f" % ( sum_error))
+
+                return
+
+            print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
+                        
 
                     
 
 
 if __name__ == '__main__':
     ann = ANN()
-    ann.first_train_assign(1)
+    ann.training(.8,50000,.1)
