@@ -1,9 +1,13 @@
-import csv
+import sqlite3
 import numpy as np
 
-NODES_PER_LAYER = [4, 2, 1] 
+NODES_PER_LAYER = [784, 2, 1] 
+
+conn = sqlite3.connect('datas.db')
+cursor = conn.cursor()
 
 class ANN:
+    
     def __init__(self):
         self.W1 = np.random.uniform(0,1, size =  (NODES_PER_LAYER[0], NODES_PER_LAYER[1]))
         self.W2 = np.random.uniform(0,1, size= (NODES_PER_LAYER[1], NODES_PER_LAYER[2]))
@@ -27,7 +31,7 @@ class ANN:
     
     def backpropagate(self, inputs , output, expected):
         delta3_activate = np.multiply(-(expected-output), self.sigmoid_derivative(self.layer3))
-        dJdW2 = np.dot(self.layer_2_activate.T, delta3_activate)
+        dJdW2 = np.dot(self.sigmoid_derivative(self.layer3), delta3_activate)
         delta2_activate = np.dot(delta3_activate, self.W2.T) * self.sigmoid_derivative(self.layer2)
         dJdW1 = np.dot(inputs.T, delta2_activate)  
         return dJdW1, dJdW2
@@ -35,23 +39,23 @@ class ANN:
     def training(self,l_rate, n_epoch, target_error):
         for epoch in range(n_epoch):
             sum_error = 0
-            with open('index.csv') as csvfile:
-                reader = csv.reader(csvfile)
-                for row in reader:
-                    float_row = np.array([float(element) for element in row[:4]]).reshape(1, 4)
-                    expected = np.array([float(row[i]) for i in range(4, 5)])
-                    output = self.feedForward(float_row)
-                    for i in range((NODES_PER_LAYER[-1])): 
-                        sum_error += (expected-output)**2
-                        dJdW1, dJdW2 = self.backpropagate(float_row, output, expected)
-                        self.update_weights(l_rate, dJdW1, dJdW2)
+            cursor.execute('select * from e_train order by random() limit 10;')
+            train = cursor.fetchall()
+            for row in train:
+                float_row = np.array([float(element) for element in row[1:]]).reshape(1, NODES_PER_LAYER[0]) 
+                expected = np.array([float(row[0])])
+                output = self.feedForward(float_row)
+                for i in range((NODES_PER_LAYER[-1])): 
+                    sum_error += (expected-output)**2
+                    dJdW1, dJdW2 = self.backpropagate(float_row, output, expected)
+                    self.update_weights(l_rate, dJdW1, dJdW2)
 
             if sum_error <= target_error:
                 print("Target Error Reached error=%.3f" % (sum_error))
                 return
 
             print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
-                        
+
 if __name__ == '__main__':
     ann = ANN()
-    ann.training(.8,1000000000,.5)
+    ann.training(1,100000000,.1)
