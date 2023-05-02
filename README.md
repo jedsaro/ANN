@@ -16,3 +16,7 @@ For all test, target error was set at .1 🚀
 <img src="images/D.png" width="400px" height="500px">
 <h2>E:</h2>
 <img src="images/E.png" width="400px" height="500px">
+
+<h1>Tables</h1>
+<img src="images/tables.png" width="400px" height="500px">
+
